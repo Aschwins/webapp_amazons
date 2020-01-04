@@ -1,0 +1,22 @@
+{% extends "base.html" %}
+
+{% import "bootstrap/utils.html" as utils %}
+
+{% block title %}Game{% endblock %}
+
+{% block head %}
+  {{ super() }}
+  <script src="static/libraries/p5.js"></script>
+  <script src="static/libraries/p5.dom.js"></script>
+  <script src="static/js/sketch.js"></script>
+{% endblock %}
+
+{% block content %}
+  <div class="container">
+    <h1>Let's play a game!</h1>
+  </div>
+
+  <div id="canvasHolder" align="center">
+    hello
+  </div>
+{% endblock %}

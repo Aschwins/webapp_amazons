@@ -6,6 +6,45 @@
 
 {% block head %}
 {{super()}}
+
+<script src="//code.jquery.com/jquery-1.12.4.min.js" integrity="sha256-ZosEbRLbNQzLpnKIkEdrPv7lOy9C27hHQ+Xp8a4MxAQ=" crossorigin="anonymous"></script>
+<script src="//cdnjs.cloudflare.com/ajax/libs/socket.io/2.2.0/socket.io.js" integrity="sha256-yr4fRk/GU1ehYJPAs8P4JlTgu0Hdsp4ZKrx8bDEDC3I=" crossorigin="anonymous"></script>
+<script type="text/javascript" charset="utf-8">
+    $(document).ready(function() {
+        console.log("JQuery ready.")
+        namespace = '/test';
+        var socket = io(namespace);
+
+        // Server response channel.
+        socket.on('server_response', function(msg) {
+            // Log the server response.
+            $('#log').append('<br>' + $('<div/>').text('Received:' + msg.data).html());
+        });
+
+        // Joining the waiting room
+        socket.on("joined_waiting_room", function(msg) {
+           $('#waiting').append('<br>' + $('<div/>').text(msg).html());
+        });
+
+        socket.on("update_waiting_room", function(msg) {
+            console.log(msg.clients_in_waiting)
+            $('#waiting').empty().append('<br>' + $('<div/>').text(msg.clients_in_waiting));
+            // Create for loop and seperate div for each client Here.
+        });
+
+        $('form#join_waiting_room').submit(function(event) {
+            socket.emit('join', {room: 'waiting_room'});
+            console.log("Joined the waiting room.")
+            return false;
+        });
+
+        // Redirects
+        socket.on('redirect', function (data) {
+            window.location = data.url;
+        });
+    });
+</script>
+
 {%- endblock %}
 
 {% block styles -%}

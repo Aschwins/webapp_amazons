@@ -5,77 +5,41 @@
    bootstrap friendly manner #}
 {% import "bootstrap/utils.html" as utils %}
 
-{% block head %}
-
-{{ super() }}
-
-<script src="//code.jquery.com/jquery-1.12.4.min.js" integrity="sha256-ZosEbRLbNQzLpnKIkEdrPv7lOy9C27hHQ+Xp8a4MxAQ=" crossorigin="anonymous"></script>
-<script src="//cdnjs.cloudflare.com/ajax/libs/socket.io/2.2.0/socket.io.js" integrity="sha256-yr4fRk/GU1ehYJPAs8P4JlTgu0Hdsp4ZKrx8bDEDC3I=" crossorigin="anonymous"></script>
-<script type="text/javascript" charset="utf-8">
-    $(document).ready(function() {
-        console.log("JQuery ready.")
-        namespace = '/test';
-        var socket = io(namespace);
-
-        socket.on('connect', function() {
-            socket.emit('my_event', {data: 'I\'m connected!'});
-        });
-
-        socket.on('my_response', function(msg) {
-            $('#log').append('<br>' + $('<div/>').text('Received:' + msg.data).html());
-        });
-
-        socket.on("joined_waiting_room", function(msg) {
-           $('#waiting').append('<br>' + $('<div/>').text(msg).html());
-        });
-
-        socket.on('redirect', function (data) {
-            window.location = data.url;
-        });
-
-        $('form#join').submit(function(event) {
-            socket.emit('join', {room: 'waiting_room'});
-            console.log("Joined the waiting room.")
-            return false;
-        });
-    });
-</script>
-
-{% endblock %}
-
 
 {# Inside the ``content`` is where you should place most of your own stuff.
    This will keep scripts at the page end and a navbar you add on later
    intact. #}
 {% block content %}
-  <div class="container">
-  {%- with messages = get_flashed_messages(with_categories=True) %}
-  {%- if messages %}
+<div class="container">
+    {%- with messages = get_flashed_messages(with_categories=True) %}
+    {%- if messages %}
     <div class="row">
-      <div class="col-md-12">
-        {{utils.flashed_messages(messages)}}
-      </div>
+        <div class="col-md-12">
+            {{utils.flashed_messages(messages)}}
+        </div>
     </div>
-  {%- endif %}
-  {%- endwith %}
+    {%- endif %}
+    {%- endwith %}
     <div class="jumbotron">
-      <h1>Welcome to Amazons</h1>
-      <p>It is time to fire up some noobs.</a>.</p>
-      <p>
-        <a class="btn btn-lg btn-default" role="button" href="http://127.0.0.1:5000/game"> Play a game.</a>
-      </p>
+        <h1>Welcome to Amazons</h1>
+        <p>It is time to fire up some noobs.</a>.</p>
+        <p>
+            <a class="btn btn-lg btn-default" role="button" href="http://127.0.0.1:5000/game"> Play a game.</a>
+        </p>
     </div>
-   </div>
+</div>
+<div class="container">
     <div>
         <h1>Flask-SocketIO Test</h1>
 
-        <form id="join" method="POST" action='#'>
+        <form id="join_waiting_room" method="POST" action='#'>
             <input type="submit" value="Join Room">
         </form>
         <h2>Receive:</h2>
         <div id="log"></div>
 
-        <h2>Player in waiting room:</h2>
+        <h2>Players in waiting room:</h2>
         <div id="waiting"></div>
     </div>
+</div>
 {%- endblock %}

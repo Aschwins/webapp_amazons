@@ -202,8 +202,8 @@ class Board {
 
     fill_board() {
         /* Fills the board with squares.*/
-        for (i = 0; i < this.n; i++) {
-            for (j = 0; j < this.m; j++) {
+        for (let i = 0; i < this.n; i++) {
+            for (let j = 0; j < this.m; j++) {
                 if ((i + j) % 2 != 0) {
                     var square_color = "Black";
                 }
@@ -223,16 +223,16 @@ class Board {
         // Fill the board with n_amazons for each side.
         var white_side = [];
         var black_side = [];
-        for (i=0; i < boardwidth; i++) {
+        for (let i=0; i < boardwidth; i++) {
             white_side.push([0, i]);
             white_side.push([i, boardwidth-1]);
         }
-        for (i=boardwidth-1; i>-1; i--) {
+        for (let i=boardwidth-1; i>-1; i--) {
             black_side.push([boardwidth-1, i]);
             black_side.push([i, 0]);
         }
         const stepsize = Math.floor(black_side.length/this.n_amazons)
-        for (i=0; i < this.n_amazons; i++){
+        for (let i=0; i < this.n_amazons; i++){
             var white_amazon_square = white_side[stepsize * i];
             var black_amazon_square = black_side[stepsize * i];
             this.matrix[
@@ -247,8 +247,8 @@ class Board {
     }
 
     reset(state) {
-        for (i = 0; i < boardwidth; i++) {
-            for (j = 0; j < boardwidth; j++) {
+        for (let i = 0; i < boardwidth; i++) {
+            for (let j = 0; j < boardwidth; j++) {
                 board.matrix[i][j].selected = false;
                 board.matrix[i][j].option = false;
                 board.state = state;
@@ -364,8 +364,8 @@ class Board {
         */
         var selected = undefined;
 
-        for (i = 0; i < boardwidth; i++){
-            for (j = 0; j < boardwidth; j++) {
+        for (let i = 0; i < boardwidth; i++){
+            for (let j = 0; j < boardwidth; j++) {
                 if (board.matrix[i][j].selected == true){
                     selected = [i, j]
                 }
@@ -402,8 +402,8 @@ class Board {
 
     show() {
         /* Shows the board on the canvas.*/
-        for (i = 0; i < this.m; i++) {
-            for (j = 0; j < this.n; j++) {
+        for (let i = 0; i < this.m; i++) {
+            for (let j = 0; j < this.n; j++) {
                 this.matrix[i][j].show()
             }
         }

@@ -17,6 +17,7 @@ from flask_socketio import SocketIO, emit, join_room, leave_room, \
      close_room, rooms, disconnect
 
 app = Flask(__name__)
+app.config["SECRET_KEY"] = "OCML3BRawWEUeaxcuKHLpw"
 Bootstrap(app)
 
 async_mode = None
@@ -67,21 +68,21 @@ def join(message):
     logger.info(f"CLIENTS IN WAITING: {clients_in_waiting}")
     emit('update_waiting_room', {'clients_in_waiting': clients_in_waiting}, broadcast=True)
 
-    # # Check if the waiting room contains enough players.
-    # if len(clients_in_waiting) > 1:
-    #     # Create a new room where both clients are joined.
-    #     for client in clients_in_waiting:
-    #         if client != request.sid:
-    #             other_player = client
-    #             break
-    #
-    #     global game_number
-    #     game_number += 1
-    #     create_game(request.sid, other_player, game_number)
-    #     clients_in_waiting.remove(request.sid)
-    #     clients_in_waiting.remove(other_player)
-    #     emit('redirect', {'url': url_for('game')}, request.sid)
-    #     emit('redirect', {'url': url_for('game')}, other_player)
+    # Check if the waiting room contains enough players.
+    if len(clients_in_waiting) > 1:
+        # Create a new room where both clients are joined.
+        for client in clients_in_waiting:
+            if client != request.sid:
+                other_player = client
+                break
+
+        global game_number
+        game_number += 1
+        create_game(request.sid, other_player, game_number)
+        clients_in_waiting.remove(request.sid)
+        clients_in_waiting.remove(other_player)
+        emit('redirect', {'url': url_for('game')}, request.sid)
+        emit('redirect', {'url': url_for('game')}, other_player)
 
 
 if __name__ == "__main__":

@@ -28,8 +28,11 @@
 
         socket.on("update_waiting_room", function(msg) {
             console.log(msg.clients_in_waiting)
-            $('#waiting').empty().append('<br>' + $('<div/>').text(msg.clients_in_waiting));
+
             // Create for loop and seperate div for each client Here.
+            for (let i=0; i < msg.clients_in_waiting.length; i++) {
+                $('#waiting').empty().append('<br>' + $('<div/>').text(msg.clients_in_waiting[i]));
+            }
         });
 
         $('form#join_waiting_room').submit(function(event) {

@@ -1,9 +1,5 @@
 {% extends "bootstrap/base.html" %}
 
-{% block title %}Game Of Amazons{% endblock %}
-
-{% import "bootstrap/fixes.html" as fixes %}
-
 {% block head %}
 {{super()}}
 
@@ -15,13 +11,20 @@
         namespace = '/test';
         var socket = io(namespace);
 
-        // Server response channel.
+        // Server response channel (Logger).
         socket.on('server_response', function(msg) {
             // Log the server response.
             $('#log').append('<br>' + $('<div/>').text('Received:' + msg.data).html());
         });
 
-        // Joining the waiting room
+        // Player joins the waiting room. client -> server
+        $('form#join_waiting_room').submit(function(event) {
+            socket.emit('join', {room: 'waiting_room'});
+            console.log("Joined the waiting room.")
+            return false;
+        });
+
+        // Show players which joined the waiting room server -> client
         socket.on("joined_waiting_room", function(msg) {
            $('#waiting').append('<br>' + $('<div/>').text(msg).html());
         });
@@ -35,12 +38,6 @@
             }
         });
 
-        $('form#join_waiting_room').submit(function(event) {
-            socket.emit('join', {room: 'waiting_room'});
-            console.log("Joined the waiting room.")
-            return false;
-        });
-
         // Redirects
         socket.on('redirect', function (data) {
             window.location = data.url;
@@ -50,13 +47,32 @@
 
 {%- endblock %}
 
+{% block navbar %}
+ <nav class="navbar navbar-inverse">
+  <div class="container-fluid">
+    <div class="navbar-header">
+      <a class="navbar-brand" href="#">Game Of Amazons</a>
+    </div>
+    <ul class="nav navbar-nav">
+      <li class="active"><a href={{ url_for('index') }}>Home</a></li>
+      <li><a href={{ url_for('index') }}>Multiplayer</a></li>
+      <li><a href={{ url_for('index') }}>Play on this screen</a></li>
+    </ul>
+    <ul class="nav navbar-nav navbar-right">
+      <li><a href={{ url_for('index') }}><span class="glyphicon glyphicon-user"></span> Sign Up</a></li>
+      <li><a href={{ url_for('index') }}><span class="glyphicon glyphicon-log-in"></span> Login</a></li>
+    </ul>
+  </div>
+</nav>
+{% endblock %}
+
+{% block title %}Game Of Amazons{% endblock %}
+
+{% import "bootstrap/fixes.html" as fixes %}
+
 {% block styles -%}
     {{super()}}  {# do not forget to call super or Bootstrap's own stylesheets
                     will disappear! #}
     <link rel="stylesheet" type="text/css"
-          href="{{url_for('static', filename='sample-app.css')}}">
-{% endblock %}
-
-{% block navbar %}
-
+          href="{{url_for('static', filename='goa.css')}}">
 {% endblock %}

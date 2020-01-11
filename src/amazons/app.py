@@ -1,20 +1,25 @@
 ## Run command
 ## FLASK_APP=src/amazons/app.py FLASK_ENV=development flask run
 import os
-
 import logging
+import numpy as np
+from threading import Lock
+from flask import Flask, jsonify, request
+from flask import render_template, session, redirect, url_for
+from flask_bootstrap import Bootstrap
+from flask_socketio import SocketIO, emit, join_room, leave_room, \
+     close_room, rooms, disconnect
 
+
+# Configure Logger
 logger = logging.getLogger(__name__)
 logging.basicConfig(
     level=logging.INFO,
     format='%(asctime)s - %(name)s - %(levelname)s - %(message)s'
 )
 
-from flask import Flask, jsonify, request
-from flask import render_template, session, redirect, url_for
-from flask_bootstrap import Bootstrap
-from flask_socketio import SocketIO, emit, join_room, leave_room, \
-     close_room, rooms, disconnect
+werkzeug_logger = logging.getLogger('werkzeug')
+werkzeug_logger.setLevel(logging.ERROR)
 
 app = Flask(__name__)
 app.config["SECRET_KEY"] = "OCML3BRawWEUeaxcuKHLpw"
@@ -27,6 +32,36 @@ socketio = SocketIO(app, async_mode=async_mode)
 clients_in_waiting = []
 game_number = 0
 
+thread = None
+thread_lock = Lock()
+
+
+def pair_clients_in_waiting(clients):
+    new_waiting_room = clients
+    p1, p2 = np.random.choice(new_waiting_room, 2, replace=False)
+    new_waiting_room.remove(p1)
+    new_waiting_room.remove(p2)
+    return new_waiting_room, tuple([p1, p2])
+
+
+def background_thread():
+    """Example of how to send server generated events to clients."""
+    count = 0
+    global clients_in_waiting
+
+    while True:
+        socketio.sleep(5)
+        count += 1
+        # Check if there are enough players
+        if len(clients_in_waiting) > 1:
+            with thread_lock:
+                clients_in_waiting, paired = pair_clients_in_waiting(clients_in_waiting)
+                socketio.emit('update_waiting_room',
+                              {'clients_in_waiting': clients_in_waiting}, broadcast=True,
+                              namespace='/test')
+                create_game(paired[0], paired[1], count)
+
+
 
 def create_game(sid1, sid2, game):
     """
@@ -34,16 +69,16 @@ def create_game(sid1, sid2, game):
     """
     join_room(str(game), sid1, '/test')
     join_room(str(game), sid2, '/test')
-    leave_room('waiting_room', sid1, '/test')
-    leave_room('waiting_room', sid2, '/test')
     emit('server_response', {'data': f"Created game #{str(game)}, between {sid1} and {sid2}"}, broadcast=True)
+
+    emit('redirect', {'url': url_for('game')}, str(game))
+    emit('server_response', {'data': f"{sid1} and {sid2} joined room {game}"}, str(game))
 
 
 @app.route("/", methods=["GET"])
-@app.route("/index", methods=["GET"])
 def index():
-    print(session)
     return render_template('index.html')
+
 
 @app.route("/game")
 def game():
@@ -53,6 +88,12 @@ def game():
 @socketio.on('connect', namespace='/test')
 def connect():
     emit('server_response', {'data': f'Connected {request.sid}'}, broadcast=True)
+
+    # Start a Thread to check wether waiting room has enough clients.
+    global thread
+    with thread_lock:
+        if thread is None:
+            thread = socketio.start_background_task(background_thread)
 
 
 @socketio.on('disconnect', namespace='/test')
@@ -65,24 +106,8 @@ def disconnect():
 def join(message):
     emit('server_response', {'data': f"Client {request.sid} joined waiting."}, broadcast=True)
     clients_in_waiting.append(request.sid)
-    logger.info(f"CLIENTS IN WAITING: {clients_in_waiting}")
+    logger.debug(f"CLIENTS IN WAITING: {clients_in_waiting}")
     emit('update_waiting_room', {'clients_in_waiting': clients_in_waiting}, broadcast=True)
-
-    # Check if the waiting room contains enough players.
-    if len(clients_in_waiting) > 1:
-        # Create a new room where both clients are joined.
-        for client in clients_in_waiting:
-            if client != request.sid:
-                other_player = client
-                break
-
-        global game_number
-        game_number += 1
-        create_game(request.sid, other_player, game_number)
-        clients_in_waiting.remove(request.sid)
-        clients_in_waiting.remove(other_player)
-        emit('redirect', {'url': url_for('game')}, request.sid)
-        emit('redirect', {'url': url_for('game')}, other_player)
 
 
 if __name__ == "__main__":

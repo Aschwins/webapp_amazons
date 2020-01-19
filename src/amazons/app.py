@@ -33,6 +33,7 @@ socketio = SocketIO(app, async_mode='threading')
 
 clients_in_waiting = []
 game_number = 0
+rooms = {}
 
 thread = None
 
@@ -83,8 +84,8 @@ def background_thread():
             socketio.emit('server_response', {'data': f"Created game #{str(game)}, between {paired[0]} and {paired[1]}"},
                  broadcast=True, namespace='/test')
 
-
-
+            global rooms
+            rooms[str(count)] = {'name': str(count), 'players': {paired[0], paired[1]}}
 
 @app.route("/", methods=["GET"])
 def index():
@@ -131,6 +132,20 @@ def join(message):
     logger.debug(f"CLIENTS IN WAITING: {clients_in_waiting}")
     emit('update_waiting_room', {'clients_in_waiting': clients_in_waiting}, broadcast=True)
 
+
+@socketio.on('move', namespace='/test')
+def move(data):
+    logger.info(data)
+    room = rooms[data['room']]
+    sid = data['player']
+    # find all players in room
+    logger.info(data['player'])
+    logger.info(f"ROOMS NIGGA {room} {room['players']}")
+    clients_in_room = room['players']
+    if sid in clients_in_room:
+        opponent = clients_in_room - {request.sid}
+        logger.info(f"Je tegenstander is {list(opponent)[0]}. Succes nerd")
+        emit('move', data, list(opponent)[0], namespace='/test')
 
 if __name__ == "__main__":
     socketio.run(app, host='0.0.0.0', debug=True)

@@ -1,6 +1,9 @@
 const boardwidth = 5;
 const sq_width = 60;
 
+const game_id = localStorage.getItem("game_id")
+const sid = localStorage.getItem("sid")
+
 const states = [
     'white_selects', 'white_moves', 'white_shoots',
     'black_selects','black_moves', 'black_shoots'];
@@ -456,15 +459,12 @@ class Square {
 }
 
 async function sendMove(data) {
-    ws.send(JSON.stringify({
-        type: 'move',
-        playerId,
-        data
-    }));
+    socket.emit('move', {player: sid, room: game_id, data: data});
 }
 
-window.addEventListener('move', function(e) {
-    var data = JSON.parse(e.detail.data).data;
+
+socket.on('move', function (data) {
+    console.log("Recieved a move from opponent.")
     console.log(data)
 
     let state = data.state;
@@ -501,7 +501,7 @@ window.addEventListener('move', function(e) {
     else {
         console.log("Something went wrong, please try again.")
     }
-}, false);
+});
 
 function mousePressed() {
     let [i, j] = SquareSelecter(mouseX, mouseY);

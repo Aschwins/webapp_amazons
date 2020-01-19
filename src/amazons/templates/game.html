@@ -5,22 +5,36 @@
 {% block title %}Game{% endblock %}
 
 {% block head %}
-  {{ super() }}
-  <script src="static/libraries/p5.js"></script>
-  <script src="static/libraries/p5.dom.js"></script>
-  <script src="static/js/sketch.js"></script>
+    {{ super() }}
+    <script src="static/libraries/p5.js"></script>
+    <script src="static/libraries/p5.dom.js"></script>
+    <script>
+        namespace = '/test';
+        var socket = io(namespace);
+
+        $(document).ready(function() {
+            var game_id = localStorage.getItem("game_id");
+            $('#game_id').append(game_id);
+        });
+    </script>
+    <script src="static/js/sketch.js"></script>
 {% endblock %}
 
 {% block content %}
-  <div class="container">
+    <div class="container">
     <h1>Let's play a game!</h1>
-  </div>
+    </div>
 
-  <div id="canvasHolder" align="center">
+    <div id="canvasHolder" align="center"></div>
 
-  </div>
+    <div class="container">
+        <p id="p1">Player 1: </p>
+        <p id="p2">Player 2: </p>
+        <p id="game_id">Game: </p>
+    </div>
 
-  <div class="container">
+
+    <div class="container">
       <div>
           <h1>Flask-SocketIO Test</h1>
 
@@ -30,5 +44,8 @@
           <h2>Player in waiting room:</h2>
           <div id="waiting"></div>
       </div>
-  </div>
+    </div>
+
+
+
 {% endblock %}

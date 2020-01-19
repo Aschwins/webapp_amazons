@@ -49,10 +49,11 @@
             $('#log').append('<br>' + $('<div/>').text('Some people joined some rooms').html());
             let room = data["room"]
             let user = data["user"]
-            console.log(data)
-            console.log(user)
             // request server to really add me to the room.
             socket.emit('join_room', {'room': room, 'user': user})
+            //set value
+            localStorage.setItem('game_id', room);
+            localStorage.setItem('sid', user);
         });
     });
 </script>

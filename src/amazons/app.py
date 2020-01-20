@@ -10,6 +10,7 @@ from flask_bootstrap import Bootstrap
 from flask_socketio import SocketIO, emit, join_room, leave_room, \
      close_room, rooms, disconnect
 
+from flaskthreads import AppContextThread
 
 # Configure Logger
 logger = logging.getLogger(__name__)
@@ -53,6 +54,9 @@ def background_thread():
         socketio.sleep(5)
         count += 1
         # Check if there are enough players
+
+        logger.info(f"COUNT {count}")
+
         if len(clients_in_waiting) > 1:
             with thread_lock:
                 clients_in_waiting, paired = pair_clients_in_waiting(clients_in_waiting)
@@ -91,9 +95,10 @@ def connect():
 
     # Start a Thread to check wether waiting room has enough clients.
     global thread
-    with thread_lock:
-        if thread is None:
-            thread = socketio.start_background_task(background_thread)
+    if thread is None:
+        thread = AppContextThread(target=background_thread)
+        thread.start()
+        thread.join()
 
 
 @socketio.on('disconnect', namespace='/test')

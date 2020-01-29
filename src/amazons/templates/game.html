@@ -15,7 +15,9 @@
         $(document).ready(function() {
             var game_id = localStorage.getItem("game_id");
             $('#game_id').append(game_id);
+            socket.emit('game_ready', {'game_id' : game_id})
         });
+
     </script>
     <script src="static/js/sketch.js"></script>
 {% endblock %}

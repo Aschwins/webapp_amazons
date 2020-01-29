@@ -2,7 +2,7 @@ const boardwidth = 5;
 const sq_width = 60;
 
 const game_id = localStorage.getItem("game_id")
-const sid = localStorage.getItem("sid")
+const uid = localStorage.getItem("uid")
 
 const states = [
     'white_selects', 'white_moves', 'white_shoots',
@@ -459,7 +459,9 @@ class Square {
 }
 
 async function sendMove(data) {
-    socket.emit('move', {player: sid, room: game_id, data: data});
+    console.log("emitting data")
+    console.log(data)
+    socket.emit('move', {uid: uid, game_id: game_id, data: data});
 }
 
 

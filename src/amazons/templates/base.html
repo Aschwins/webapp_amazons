@@ -47,13 +47,13 @@
         // Join Room
         socket.on('join_room', function (data) {
             $('#log').append('<br>' + $('<div/>').text('Some people joined some rooms').html());
-            let room = data["room"]
-            let user = data["user"]
+            let game_id = data["game_id"]
+            let uid = data["uid"]
             // request server to really add me to the room.
-            socket.emit('join_room', {'room': room, 'user': user})
+            socket.emit('join_room', {'game_id' : game_id, 'uid': uid})
             //set value
-            localStorage.setItem('game_id', room);
-            localStorage.setItem('sid', user);
+            localStorage.setItem('game_id', game_id);
+            localStorage.setItem('uid', uid);
         });
     });
 </script>

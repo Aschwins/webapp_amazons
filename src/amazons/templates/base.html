@@ -17,41 +17,27 @@
             $('#log').append('<br>' + $('<div/>').text('Received:' + msg.data).html());
         });
 
-        // Player joins the waiting room. client -> server
+        // Player joins the waiting room.
         $('form#join_waiting_room').submit(function(event) {
             socket.emit('join', {room: 'waiting_room'});
-            console.log("Joined the waiting room.")
             return false;
         });
 
-        // Show players which joined the waiting room server -> client
-        socket.on("joined_waiting_room", function(msg) {
-           $('#waiting').append('<br>' + $('<div/>').text(msg).html());
-        });
-
         socket.on("update_waiting_room", function(msg) {
-            console.log(msg.clients_in_waiting)
-
-            // Create for loop and seperate div for each client Here.
-            for (let i=0; i < msg.clients_in_waiting.length; i++) {
-                $('#waiting').empty().append('<br>' + $('<div/>').text(msg.clients_in_waiting[i]));
-            }
+            console.log(msg.clients_in_waiting);
+            $('#waiting').empty().append('<br>' + $('<div/>').text(msg.clients_in_waiting.toString()).html());
         });
 
         // Redirects
         socket.on('redirect', function (data) {
-            console.log("Redirecting.")
             window.location = data.url;
         });
 
         // Join Room
         socket.on('join_room', function (data) {
-            $('#log').append('<br>' + $('<div/>').text('Some people joined some rooms').html());
             let game_id = data["game_id"]
             let uid = data["uid"]
-            // request server to really add me to the room.
             socket.emit('join_room', {'game_id' : game_id, 'uid': uid})
-            //set value
             localStorage.setItem('game_id', game_id);
             localStorage.setItem('uid', uid);
         });

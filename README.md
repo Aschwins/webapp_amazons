@@ -28,4 +28,4 @@ python3 setup.py
 python src/amazons/app.py
 ```
 
-Happy hunting!
+Happy hunting! :)

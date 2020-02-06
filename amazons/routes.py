@@ -25,16 +25,6 @@ clients_in_waiting = []
 game_number = 0
 
 
-class User(db.Model):
-    id = db.Column(db.Integer, primary_key=True)
-    username = db.Column(db.String(80), unique=True, nullable=False)
-    email = db.Column(db.String(120), unique=True, nullable=False)
-    password_hash = db.Column(db.String, nullable=False)
-
-    def __repr__(self):
-        return '<User %r>' % self.username
-
-
 def pair_clients_in_waiting(clients):
     """Client get paired via FIFO, First In First Out"""
     new_waiting_room = clients
@@ -113,7 +103,7 @@ def login():
     form = LoginForm()
     if form.validate_on_submit():
         flash("Login requested for user {}, remember_me={}".format(form.username.data, form.remember_me.data))
-        return redirect('/index')
+        return redirect(url_for('index'))
     return render_template('login.html', title='Sign In', form=form)
 
 

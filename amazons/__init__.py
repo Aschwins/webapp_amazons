@@ -15,4 +15,4 @@ migrate = Migrate(app, db)
 
 socketio = SocketIO(app, async_mode='threading')
 
-from amazons import routes
+from amazons import routes, models

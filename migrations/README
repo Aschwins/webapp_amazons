@@ -1,1 +1,12 @@
 Generic single-database configuration.
+
+Use
+
+```python
+flask db init
+flask db migrate
+
+flask db upgrade
+flask db downgrade
+
+```

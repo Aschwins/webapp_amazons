@@ -1,23 +1,20 @@
-## Run command
-## FLASK_APP=src/amazons/app.py FLASK_ENV=development flask run
 import time
 import uuid
 import pandas as pd
-from flask import Flask, jsonify, request, make_response
+
+from flask import request, make_response, flash
 from flask import render_template, session, redirect, url_for
-from flask_bootstrap import Bootstrap
 from flask_socketio import SocketIO, emit, join_room, leave_room, \
     close_room, rooms, disconnect
 
-from amazons.util import configure_loggers
+from util import configure_loggers
+from forms import LoginForm
+
+from amazons import app, db, socketio, migrate
 
 logger = configure_loggers()
 
 # Configure App
-app = Flask(__name__)
-app.config["SECRET_KEY"] = "OCML3BRawWEUeaxcuKHLpw"
-Bootstrap(app)
-socketio = SocketIO(app, async_mode='threading')
 
 async_mode = None
 thread = None
@@ -26,6 +23,16 @@ thread = None
 status = pd.DataFrame(columns=["uid", "sid", "connected", "in_waiting", "game_id"])
 clients_in_waiting = []
 game_number = 0
+
+
+class User(db.Model):
+    id = db.Column(db.Integer, primary_key=True)
+    username = db.Column(db.String(80), unique=True, nullable=False)
+    email = db.Column(db.String(120), unique=True, nullable=False)
+    password_hash = db.Column(db.String, nullable=False)
+
+    def __repr__(self):
+        return '<User %r>' % self.username
 
 
 def pair_clients_in_waiting(clients):
@@ -73,6 +80,7 @@ def background_thread():
 
 
 @app.route("/", methods=["GET", "POST"])
+@app.route("/index", methods=["GET", "POST"])
 def index():
     resp = make_response(render_template('index.html'))
     uid = request.cookies.get('uid', None)
@@ -98,6 +106,15 @@ def index():
             )
     logger.info(status)
     return resp
+
+
+@app.route("/login", methods = ["GET", "POST"])
+def login():
+    form = LoginForm()
+    if form.validate_on_submit():
+        flash("Login requested for user {}, remember_me={}".format(form.username.data, form.remember_me.data))
+        return redirect('/index')
+    return render_template('login.html', title='Sign In', form=form)
 
 
 @app.route("/game")
@@ -183,4 +200,5 @@ def game_ready(data):
 
 
 if __name__ == "__main__":
+    db.create_all()
     socketio.run(app, host='0.0.0.0', debug=True)

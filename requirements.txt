@@ -1,2 +1,5 @@
 flask-socketio
 flask
+flask-sqlalchemy
+python-dotenv
+flask-wtf

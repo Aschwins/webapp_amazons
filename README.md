@@ -5,7 +5,7 @@
 This is the repository for the web application: Game of Amazons. Inspired by the amazing numberphile video with mathematician 
 Elwyn Berlekamp. [video](https://www.youtube.com/watch?v=kjSOSeRZVNg)
 
-![Erwyn](src/amazons/static/img/elwynamazons.jpg)
+![Erwyn](amazons/static/img/elwynamazons.jpg)
 
 ## Development
 

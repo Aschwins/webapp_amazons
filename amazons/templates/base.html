@@ -19,9 +19,10 @@
 
         // Player joins the waiting room.
         $('form#join_waiting_room').submit(function(event) {
-            socket.emit('join', {room: 'waiting_room'});
+            socket.emit('join_waiting', {room: 'waiting_room'});
             return false;
         });
+
 
         socket.on("update_waiting_room", function(msg) {
             console.log(msg.clients_in_waiting);
@@ -34,7 +35,7 @@
         });
 
         // Join Room
-        socket.on('join_room', function (data) {
+        socket.on('join_game', function (data) {
             let game_id = data["game_id"]
             let uid = data["uid"]
             socket.emit('join_room', {'game_id' : game_id, 'uid': uid})

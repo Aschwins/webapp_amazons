@@ -3,25 +3,43 @@
 {% block content %}
 {{ super() }}
 <div class="container">
-    <h1>Sign in</h1>
-    <form action="" method="post" novalidate>
-        {{form.hidden_tag()}}
-        <p>
-            {{ form.username.label }}<br>
-            {{ form.username(size=32)}}
-            {% for error in form.username.errors %}
-                <span style="color: red;">[{{ error }}]</span>
-            {% endfor %}
-        </p>
-        <p>
-            {{ form.password.label }}<br>
-            {{ form.password(size=32)}}
-            {% for error in form.password.errors %}
-                <span style="color: red;">[{{ error }}]</span>
-            {% endfor %}
-        </p>
-        <p>{{ form.remember_me() }} {{ form.remember_me.label }}</p>
-        <p>{{ form.submit() }}</p>
-    </form>
+
+</div>
+
+<div class="container">
+
+</div>
+
+<div class="container-fluid">
+    <div class="row">
+        <div class="col-lg-6">
+            <h1>Sign in</h1>
+            <form action="" method="post" novalidate>
+                {{form.hidden_tag()}}
+                <p>
+                    {{ form.username.label }}<br>
+                    {{ form.username(size=32)}}
+                    {% for error in form.username.errors %}
+                        <span style="color: red;">[{{ error }}]</span>
+                    {% endfor %}
+                </p>
+                <p>
+                    {{ form.password.label }}<br>
+                    {{ form.password(size=32)}}
+                    {% for error in form.password.errors %}
+                        <span style="color: red;">[{{ error }}]</span>
+                    {% endfor %}
+                </p>
+                <p>{{ form.remember_me() }} {{ form.remember_me.label }}</p>
+                <p>{{ form.submit() }}</p>
+            </form>
+        </div>
+        <div class="col-lg-6">
+            Continue Anonymously <br>
+            This mode will not track you're progress amongst other players.
+            Username:
+            Continue
+        </div>
+    </div>
 </div>
 {% endblock %}

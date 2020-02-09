@@ -12,6 +12,11 @@ class LoginForm(FlaskForm):
     submit = SubmitField('Sign In')
 
 
+class AnonymousLoginForm(FlaskForm):
+    username = StringField('Username', validators=[DataRequired()])
+    submit = SubmitField('Continue anonymously')
+
+
 class RegistrationForm(FlaskForm):
     username = StringField('Username', validators=[DataRequired()])
     email = StringField('Email', validators=[DataRequired(), Email()])

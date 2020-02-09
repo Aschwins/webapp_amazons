@@ -12,7 +12,7 @@ from util import configure_loggers
 from forms import LoginForm, RegistrationForm
 
 from amazons import app, db, socketio, migrate
-from amazons.models import User
+from amazons.models import User, Game, Player
 
 from werkzeug.urls import url_parse
 
@@ -24,9 +24,7 @@ async_mode = None
 thread = None
 
 # Set Global Variables
-status = pd.DataFrame(columns=["uid", "sid", "connected", "in_waiting", "game_id"])
 clients_in_waiting = []
-game_number = 0
 
 
 def pair_clients_in_waiting(clients):
@@ -39,17 +37,27 @@ def pair_clients_in_waiting(clients):
     return new_waiting_room, tuple([p1, p2])
 
 
-def create_game(user1, user2, game_id):
+def create_game(user1, user2):
     """
     Function that pairs two players from the waiting room to a amazons game.
-    """
-    global status
-    for user in [user1, user2]:
-        socketio.emit('join_room', {'uid': user[1], 'game_id': game_id}, user[0], namespace='/test')
-        status.loc[status["uid"] == user[1], "in_waiting"] = False
-        status.loc[status["uid"] == user[1], "game_id"] = str(game_id)
 
-    socketio.emit('server_response', {'data': f"Created game #{str(game_id)}, between {user1} and {user2}"},
+    Make entry in Game Model with player1 and player2 and game
+    """
+    user1 = User.query.get(user1[0])
+    user2 = User.query.get(user2[0])
+
+    game = Game(user_started_id=user1.id)
+    db.session.add(game)
+    db.session.commit()
+
+    for user in [user1, user2]:
+        socketio.emit('join_game', {'uid': user.id, 'game_id': game.id}, user.sid, namespace='/test')
+
+    player1 = Player(user_id=user1.id, game_id=game.id)
+    player2 = Player(user_id=user2.id, game_id=game.id)
+    db.session.add_all([player1, player2])
+    db.session.commit()
+    socketio.emit('server_response', {'data': f"Created game #{str(game.id)}, between {user1} and {user2}"},
                   broadcast=True, namespace='/test')
 
 
@@ -70,35 +78,15 @@ def background_thread():
             socketio.emit('update_waiting_room',
                           {'clients_in_waiting': clients_in_waiting}, broadcast=True, namespace='/test')
 
-            create_game(paired[0], paired[1], count)
+            create_game(paired[0], paired[1])
+
 
 
 @app.route("/", methods=["GET", "POST"])
 @app.route("/index", methods=["GET", "POST"])
+@login_required
 def index():
     resp = make_response(render_template('index.html'))
-    uid = request.cookies.get('uid', None)
-    global status
-    if uid is None: # This is a first time user
-        uid = str(uuid.uuid4())
-        resp.set_cookie('uid', uid)
-        status = pd.concat([
-            status,
-            pd.DataFrame(
-                {"uid": [uid], "sid": [None], "connected": [True], "in_waiting": [False], "game_id": [None]}
-            )]
-        )
-    else: # We've already seen this user.
-        if uid in status["uid"].values:
-            status.loc[status["uid"] == uid, 'connected'] = True
-        else:
-            status = pd.concat([
-                status,
-                pd.DataFrame(
-                    {"uid": [uid], "sid": [None], "connected": [True], "in_waiting": [False], "game_id": [None]}
-                )]
-            )
-    logger.info(status)
     return resp
 
 
@@ -147,6 +135,7 @@ def register():
     return render_template("register.html", title='Register', form=form)
 
 
+@login_required
 @app.route("/game")
 def game():
     return render_template('game.html')
@@ -166,21 +155,19 @@ def connect():
         logger.info("Start Thread")
         thread = socketio.start_background_task(background_thread)
 
-    emit('server_response', {'data': f'Connected {request.sid}'}, broadcast=True)
+    if current_user.is_authenticated:
+        emit('server_response', {'data': f'Connected {request.sid, current_user.username}'}, broadcast=True)
 
-    uid = request.cookies.get('uid', None) # Because of document ready the cookie is there.
-    global status
-    status.loc[status["uid"] == uid, "sid"] = request.sid
+        # Set socket_id for user whenever user connects.
+        current_user.sid = request.sid
+        db.session.commit()
 
 
 @socketio.on('disconnect', namespace='/test')
 def disconnect():
-    global status
     emit('server_response', {'data': f'Disconnected {request.sid}'}, broadcast=True)
-    uid = request.cookies.get('uid')
-
-    status.loc[status["uid"] == uid, "connected"] = False
-    logger.info(f"Client {uid} disconnected")
+    if current_user.is_authenticated:
+        logger.info(f"Client {current_user.sid} disconnected")
 
 
 @socketio.on('join_room', namespace='/test')
@@ -191,26 +178,27 @@ def on_join(data):
     emit('redirect', {'url': url_for('game')}, namespace='/test')
 
 
-@socketio.on('join', namespace='/test')
-def join(message):
-    uid = request.cookies.get('uid')
+@socketio.on('join_waiting', namespace='/test')
+def join_waiting(message):
+    current_user.sid = request.sid
+    db.session.commit()
 
-    global status
-    status.loc[status["uid"] == uid, 'sid'] = request.sid
-    status.loc[status["uid"] == uid, 'in_waiting'] = True
-    logger.info(f"Join: {status}")
-
-    clients_in_waiting.append((request.sid, request.cookies.get('uid')))
+    clients_in_waiting.append((current_user.id, current_user.username))
     emit('update_waiting_room', {'clients_in_waiting': str(clients_in_waiting)}, broadcast=True)
 
 
 @socketio.on('move', namespace='/test')
 def move(data):
     game_id = data["game_id"]
-    uid = request.cookies.get('uid')
+    uid = current_user.id
 
     # Now with the uid and game_id we can find his opponent, and his channel.
-    opponent_sid = status.loc[(status['uid'] != uid) & (status["game_id"] == game_id), "sid"].values[0]
+    players = Player.query.filter_by(game_id = int(game_id))
+    for player in players:
+        if player.user_id != uid:
+            # found opponent
+            opponent_uid = player.user_id
+            opponent_sid = User.query.get(opponent_uid).sid
     logger.info(opponent_sid)
     emit('move', data["data"], opponent_sid, namespace='/test')
 
@@ -220,13 +208,11 @@ def game_ready(data):
     """
     Whenever the game is ready we want to update the status with the right request.sids.
     """
-    global status
-    uid = request.cookies.get('uid')
-    new_sid = request.sid
-    status.loc[status['uid'] == uid, 'sid'] = new_sid
+    current_user.sid = request.sid
+    db.session.commit()
 
-    logger.debug("Updated sid")
-    logger.debug(status)
+    logger.info("Updated sid")
+    logger.info(current_user.sid)
 
 
 if __name__ == "__main__":

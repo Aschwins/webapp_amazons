@@ -29,6 +29,9 @@ class Player(db.Model):
     user_id = db.Column(db.Integer, db.ForeignKey('user.id'))
     game_id = db.Column(db.Integer, db.ForeignKey('game.id'))
 
+    def __repr__(self):
+        return f'<Player {self.user_id}>'
+
 
 class Game(db.Model):  # many to many with User
     id = db.Column(db.Integer, primary_key=True)
@@ -36,6 +39,9 @@ class Game(db.Model):  # many to many with User
     timestamp = db.Column(db.DateTime, index=True, default=datetime.utcnow)
 
     player = db.relationship('Player', backref='game', lazy='dynamic')
+
+    def __repr__(self):
+        return '<Game %r>' % self.id
 
 
 @login.user_loader

@@ -19,7 +19,7 @@
 
         // Player joins the waiting room.
         $('form#join_waiting_room').submit(function(event) {
-            socket.emit('join_waiting', {room: 'waiting_room'});
+            socket.emit('join_waiting');
             return false;
         });
 

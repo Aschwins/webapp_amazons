@@ -179,7 +179,7 @@ def on_join(data):
 
 
 @socketio.on('join_waiting', namespace='/test')
-def join_waiting(message):
+def join_waiting():
     current_user.sid = request.sid
     db.session.commit()
 
@@ -189,17 +189,21 @@ def join_waiting(message):
 
 @socketio.on('move', namespace='/test')
 def move(data):
+    logger.info(f"Recieved a move from a client {data}")
+    logger.info(f"from client: {current_user.id}, {current_user.username}")
     game_id = data["game_id"]
     uid = current_user.id
 
     # Now with the uid and game_id we can find his opponent, and his channel.
-    players = Player.query.filter_by(game_id = int(game_id))
+    players = Player.query.filter_by(game_id=int(game_id))
     for player in players:
-        if player.user_id != uid:
+        logger.info(f'Found player in gameid: {game_id}: {player.id}, {player.user_id}, {player.game_id}')
+
+        if int(player.user_id) != int(uid):
             # found opponent
             opponent_uid = player.user_id
             opponent_sid = User.query.get(opponent_uid).sid
-    logger.info(opponent_sid)
+    logger.info(f"Sending move to opponent: {opponent_sid}")
     emit('move', data["data"], opponent_sid, namespace='/test')
 
 

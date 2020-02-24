@@ -33,15 +33,34 @@ class Player(db.Model):
         return f'<Player {self.user_id}>'
 
 
+class Move(db.Model):
+    id = db.Column(db.Integer, primary_key=True)
+    game_id = db.Column(db.Integer, db.ForeignKey('game.id'))
+    player_id = db.Column(db.Integer, db.ForeignKey('player.id'))
+    move_type = db.Column(db.String(40))
+    move_order = db.Column(db.Integer)
+    move_notation = db.Column(db.String(80))
+    from_position = db.Column(db.String(20))
+    to_position = db.Column(db.String(20))
+
+
 class Game(db.Model):  # many to many with User
     id = db.Column(db.Integer, primary_key=True)
     user_started_id = db.Column(db.Integer, db.ForeignKey('user.id'))
     timestamp = db.Column(db.DateTime, index=True, default=datetime.utcnow)
-
     player = db.relationship('Player', backref='game', lazy='dynamic')
+
+    result_id = db.Column(db.Integer, db.ForeignKey('result.id'))
 
     def __repr__(self):
         return '<Game %r>' % self.id
+
+
+class Result(db.Model):
+    id = db.Column(db.Integer, primary_key=True)
+    description = db.Column(db.String(20))
+
+    game = db.relationship('Game', backref='result', lazy='dynamic')
 
 
 @login.user_loader

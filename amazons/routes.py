@@ -12,7 +12,7 @@ from util import configure_loggers
 from forms import LoginForm, RegistrationForm
 
 from amazons import app, db, socketio, migrate
-from amazons.models import User, Game, Player
+from amazons.models import User, Game, Player, Move
 
 from werkzeug.urls import url_parse
 
@@ -51,7 +51,7 @@ def create_game(user1, user2):
     db.session.commit()
 
     for user in [user1, user2]:
-        socketio.emit('join_game', {'uid': user.id, 'game_id': game.id}, user.sid, namespace='/test')
+        socketio.emit('join_game', {'uid': user.id, 'game_id': game.id, 'turn': user1.id}, user.sid, namespace='/test')
 
     player1 = Player(user_id=user1.id, game_id=game.id)
     player2 = Player(user_id=user2.id, game_id=game.id)
@@ -193,6 +193,22 @@ def move(data):
     logger.info(f"from client: {current_user.id}, {current_user.username}")
     game_id = data["game_id"]
     uid = current_user.id
+    player = Player.query.filter_by(user_id=uid, game_id=game_id).first()
+    player_id = player.id
+
+    # get move order
+    last_move_in_game = Move.query.filter_by(game_id=game_id).last()
+    if last_move_in_game:
+        move_order = last_move_in_game.move_order + 1
+    else:
+        move_order = 0
+
+    # Log move in db
+    m = Move(game_id=game_id, player_id=player.id, move_type=data["move_type"], move_order=move_order,
+             from_position=data["from_position"], to_position=data["to_position"])
+
+    db.session.add(m)
+    db.session.commit()
 
     # Now with the uid and game_id we can find his opponent, and his channel.
     players = Player.query.filter_by(game_id=int(game_id))
@@ -204,7 +220,8 @@ def move(data):
             opponent_uid = player.user_id
             opponent_sid = User.query.get(opponent_uid).sid
     logger.info(f"Sending move to opponent: {opponent_sid}")
-    emit('move', data["data"], opponent_sid, namespace='/test')
+    data["turn"] = opponent_uid
+    emit('move', data, opponent_sid, namespace='/test')
 
 
 @socketio.on("game_ready", namespace='/test')

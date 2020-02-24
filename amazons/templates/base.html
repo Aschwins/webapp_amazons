@@ -38,9 +38,11 @@
         socket.on('join_game', function (data) {
             let game_id = data["game_id"]
             let uid = data["uid"]
+            let turn = data["turn"]
             socket.emit('join_room', {'game_id' : game_id, 'uid': uid})
             localStorage.setItem('game_id', game_id);
             localStorage.setItem('uid', uid);
+            localStorage.setItem('turn', turn)
         });
     });
 </script>

@@ -564,6 +564,7 @@ function mousePressed() {
                 if (board.matrix[i][j].option == true) {
                     board.matrix[i][j].state = "F"; // burn the square
                     sendMove(data);
+                    turn = -1;
                     board.reset("black_selects");
                 } else {
                     return;
@@ -608,6 +609,7 @@ function mousePressed() {
                 if (board.matrix[i][j].option == true) {
                     board.matrix[i][j].state = "F"; // burn the square
                     sendMove(data);
+                    turn = -1;
                     board.reset("white_selects")
                 } else {
                     return;

@@ -191,13 +191,12 @@ def join_waiting():
 def move(data):
     logger.info(f"Recieved a move from a client {data}")
     logger.info(f"from client: {current_user.id}, {current_user.username}")
-    game_id = data["game_id"]
+    game_id = int(data["game_id"])
     uid = current_user.id
     player = Player.query.filter_by(user_id=uid, game_id=game_id).first()
-    player_id = player.id
 
     # get move order
-    last_move_in_game = Move.query.filter_by(game_id=game_id).last()
+    last_move_in_game = Move.query.filter_by(game_id=game_id).order_by(Move.id.desc()).first()
     if last_move_in_game:
         move_order = last_move_in_game.move_order + 1
     else:
@@ -205,7 +204,7 @@ def move(data):
 
     # Log move in db
     m = Move(game_id=game_id, player_id=player.id, move_type=data["move_type"], move_order=move_order,
-             from_position=data["from_position"], to_position=data["to_position"])
+             from_position=str(data.get("from_position")), to_position=str(data["to_position"]))
 
     db.session.add(m)
     db.session.commit()
@@ -219,6 +218,7 @@ def move(data):
             # found opponent
             opponent_uid = player.user_id
             opponent_sid = User.query.get(opponent_uid).sid
+
     logger.info(f"Sending move to opponent: {opponent_sid}")
     data["turn"] = opponent_uid
     emit('move', data, opponent_sid, namespace='/test')

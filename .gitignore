@@ -1,7 +1,4 @@
 # amazons
-migrations/
-app.db
-amazons/app.db
 
 **/data/
 # Byte-compiled / optimized / DLL files

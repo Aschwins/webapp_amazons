@@ -3,6 +3,7 @@ flask
 flask-sqlalchemy
 flask-migrate
 python-dotenv
+email_validator
 flask-wtf
 flask-login
 flask-bootstrap

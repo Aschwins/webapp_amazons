@@ -1,6 +1,4 @@
 import time
-import uuid
-import pandas as pd
 
 from flask import request, make_response, flash
 from flask import render_template, session, redirect, url_for

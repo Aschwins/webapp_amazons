@@ -1,6 +1,11 @@
 flask-socketio
 flask
 flask-sqlalchemy
+flask-migrate
 python-dotenv
 flask-wtf
 flask-login
+flask-bootstrap
+gunicorn
+eventlet
+pandas

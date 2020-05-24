@@ -1,2 +1,0 @@
-FLASK_APP=wsgi.py
-FLASK_RUN_PORT=8000

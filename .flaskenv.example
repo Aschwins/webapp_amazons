@@ -1,0 +1,4 @@
+FLASK_APP=wsgi.py
+FLASK_ENV=development
+FLASK_RUN_PORT=8000
+SECRET_KEY=asoihdnegaw039yn2q0i8ghnas0e9hbgawg

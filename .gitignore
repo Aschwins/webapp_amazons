@@ -1,5 +1,7 @@
 # amazons
 .flaskenv
+migrations/
+amazons/app.db
 
 **/data/
 # Byte-compiled / optimized / DLL files

@@ -21,7 +21,7 @@ virtualenv -p python3 venv
 source venv/bin/activate
 
 # Install the dependencies
-pip install requirements.txt
+pip install -r requirements.txt
 python3 setup.py
 
 # Run the application

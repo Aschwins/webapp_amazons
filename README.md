@@ -21,11 +21,19 @@ virtualenv -p python3 venv
 source venv/bin/activate
 
 # Install the dependencies
-pip install requirements.txt
-python3 setup.py
+pip install -r requirements.txt
+python3 setup.py develop
+
+# Copy flask env and rename to env
+cp .flaskenv.example .flaskenv
+
+# Create database
+flask db init
+flask db migrate -m 'init'
+flask db upgrade
 
 # Run the application
-python src/amazons/app.py
+flask run
 ```
 
 Happy hunting!

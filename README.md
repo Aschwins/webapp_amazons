@@ -29,3 +29,23 @@ python src/amazons/app.py
 ```
 
 Happy hunting!
+
+## Production
+
+https://game-of-amazons.org
+
+For the production version of the web application we use a linux server in Amazon Lightsail.
+
+
+### Supervisor
+We're using the [supervisor](http://supervisord.org/) to run gunicorn in the background. The config file for the 
+supervisor can be found in `/etc/supervisor/conf.d`. Use 
+```sudo supervisorctl reload```
+to start the server.
+
+### Nginx
+We use nginx as a reverse proxy. The config can be found at `/etc/nginx/sites-enabled/amazons`. All requests to http 
+(port 80) get rerouted to https (443), which get rerouted to the webapp server on port 8000.
+```sudo service nginx reload```
+
+

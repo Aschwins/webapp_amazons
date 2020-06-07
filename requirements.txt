@@ -10,3 +10,4 @@ flask-bootstrap
 gunicorn
 eventlet
 pandas
+pymysql

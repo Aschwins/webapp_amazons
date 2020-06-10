@@ -221,6 +221,28 @@ def move(data):
     data["turn"] = opponent_uid
     emit('move', data, opponent_sid, namespace='/test')
 
+@socketio.on('end', namespace='/test')
+def end(data):
+    logger.info(f"Game ended for player  {current_user.id}, {current_user.username}")
+    logger.info(f"with status {data}")
+    game_id = int(data["game_id"])
+    uid = current_user.id
+    player = Player.query.filter_by(user_id=uid, game_id=game_id).first()
+
+    # Now with the uid and game_id we can find his opponent, and his channel.
+    players = Player.query.filter_by(game_id=int(game_id))
+    for player in players:
+        logger.info(f'Found player in gameid: {game_id}: {player.id}, {player.user_id}, {player.game_id}')
+
+        if int(player.user_id) != int(uid):
+            # found opponent
+            opponent_uid = player.user_id
+            opponent_sid = User.query.get(opponent_uid).sid
+
+    logger.info(f"Sending move to opponent: {opponent_sid}")
+    data["turn"] = opponent_uid
+    emit('end', data, current_user.sid, namespace='/test')
+    emit('end', data, opponent_sid, namespace='/test')
 
 @socketio.on("game_ready", namespace='/test')
 def game_ready(data):

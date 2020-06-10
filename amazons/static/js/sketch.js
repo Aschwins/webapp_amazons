@@ -188,7 +188,7 @@ function ShowOptions(board, i, j){
 
 class Board {
     constructor(
-        x, y, w, h, sq_width, state, n_amazons
+        x, y, w, h, sq_width, state, n_amazons, end
         ) {
         this.x = x;
         this.y = y;
@@ -260,7 +260,7 @@ class Board {
         }
     }
 
-    show_options(i, j) {
+    show_options(i, j, draw) {
         /*
         Shows all available options for a selected square in a board object.
         Options are squares that can be reached horizontally, vertically
@@ -355,9 +355,11 @@ class Board {
             }
         }
 
-        options.forEach(option => {
-            this.matrix[option[0]][option[1]].option = true;
-        });
+        if (draw) {
+            options.forEach(option => {
+                this.matrix[option[0]][option[1]].option = true;
+            });
+        }
 
         return options;
     }
@@ -402,6 +404,51 @@ class Board {
         //         board.matrix[i][j].option = false;
         //     }
         // }
+    }
+
+    gameEnded() {
+        var end = false;
+
+        let whiteStuck = !board.hasMoves("White Amazon");
+        let blackStuck = !board.hasMoves("Black Amazon");
+        if (whiteStuck || blackStuck) {
+            end = true;
+            if (whiteStuck && blackStuck) {
+                board.state = "Game Drawn"
+            }
+            else if (whiteStuck) {
+                board.state = "Black Wins"
+            }
+            else if (blackStuck) {
+                board.state = "White Wins"
+            }
+        }
+
+        return end;
+    }
+
+    hasMoves(color) {
+        var hasMoves = false;
+
+        /* Loop over all fields, checking if there is a movable piece there */
+        for (let i = 0; i < this.m; i++) {
+            for (let j = 0; j < this.n; j++) {
+                if (this.matrix[i][j].state == color) {
+                    let options = this.show_options(i, j, false);
+
+                    if (options.length > 0) {
+                        hasMoves = true;
+                        break;
+                    }
+                }
+            }
+
+            if (hasMoves) {
+                break;
+            }
+        }
+
+        return hasMoves;
     }
 
     show() {
@@ -466,6 +513,11 @@ async function sendMove(data){
     socket.emit('move', data)
 }
 
+async function sendResult(data){
+    console.log("Sending data to the server")
+    console.log(data)
+    socket.emit('end', data)
+}
 
 socket.on('move', function (data) {
     console.log("Recieved a move from opponent.")
@@ -485,7 +537,7 @@ socket.on('move', function (data) {
         board.reset("white_shoots"); // reset the board to white_shoots.
         // Prepare shooting
         board.matrix[to_i][to_j].selected = true;
-        board.show_options(to_i, to_j);
+        board.show_options(to_i, to_j, true);
     }
     else if (board.state == "white_shoots") {
         // shoot arrow
@@ -497,7 +549,7 @@ socket.on('move', function (data) {
         board.reset("black_shoots"); // reset the board to white_shoots.
         // Prepare shooting
         board.matrix[to_i][to_j].selected = true;
-        board.show_options(to_i, to_j);
+        board.show_options(to_i, to_j, true);
     }
     else if (board.state == "black_shoots") {
         // shoot arrow
@@ -507,6 +559,17 @@ socket.on('move', function (data) {
     else {
         console.log("Something went wrong, please try again.")
     }
+});
+
+socket.on('end', function(data) {
+    console.log("Notified of game end by the server.")
+    console.log(data)
+
+    let state = data.move_type;
+    board.state = state;
+
+    alert(state)
+    document.location = '/'
 });
 
 function mousePressed() {
@@ -537,7 +600,7 @@ function mousePressed() {
                     board.reset("white_shoots"); // reset the board to white_shoots.
                     // Prepare shooting
                     board.matrix[i][j].selected = true;
-                    board.show_options(i, j);
+                    board.show_options(i, j, true);
                 }
                 // White Amazon gets pressed.
                 else if (board.matrix[i][j].state == "White Amazon") {
@@ -549,7 +612,7 @@ function mousePressed() {
                     else {
                         board.reset("white_selects");
                         board.matrix[i][j].selected = true;
-                        board.show_options(i, j);
+                        board.show_options(i, j, true);
                     }
                 }
                 // Anything else happens.
@@ -566,6 +629,18 @@ function mousePressed() {
                     sendMove(data);
                     turn = -1;
                     board.reset("black_selects");
+
+                    // check if black or white has no moves left
+                    if (board.gameEnded()) {
+                        const end = {
+                            "game_id": game_id,
+                            "uid": uid,
+                            "move_type": board.state,
+                            "from_position": undefined,
+                            "to_position": undefined
+                        };
+                        sendResult(end);
+                    }
                 } else {
                     return;
                 }
@@ -582,7 +657,7 @@ function mousePressed() {
                     board.reset("black_shoots"); // reset the board to black_shoots.
                     // Prepare shooting
                     board.matrix[i][j].selected = true;
-                    board.show_options(i, j);
+                    board.show_options(i, j, true);
                 }
                 // Black Amazon gets pressed.
                 else if (board.matrix[i][j].state == "Black Amazon") {
@@ -594,7 +669,7 @@ function mousePressed() {
                     else {
                         board.reset("black_selects");
                         board.matrix[i][j].selected = true;
-                        board.show_options(i, j);
+                        board.show_options(i, j, true);
                     }
                 }
                 // Anything else happens.
@@ -611,6 +686,18 @@ function mousePressed() {
                     sendMove(data);
                     turn = -1;
                     board.reset("white_selects")
+
+                    // check if black or white has no moves left
+                    if (board.gameEnded()) {
+                        const end = {
+                            "game_id": game_id,
+                            "uid": uid,
+                            "move_type": board.state,
+                            "from_position": undefined,
+                            "to_position": undefined
+                        };
+                        sendResult(end);
+                    }
                 } else {
                     return;
                 }

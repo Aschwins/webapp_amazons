@@ -407,12 +407,12 @@ class Board {
     }
 
     gameEnded() {
-        var end = false;
+        var ended = false;
 
         let whiteStuck = !board.hasMoves("White Amazon");
         let blackStuck = !board.hasMoves("Black Amazon");
         if (whiteStuck || blackStuck) {
-            end = true;
+            ended = true;
             if (whiteStuck && blackStuck) {
                 board.state = "Game Drawn"
             }
@@ -424,7 +424,7 @@ class Board {
             }
         }
 
-        return end;
+        return ended;
     }
 
     hasMoves(color) {
@@ -715,6 +715,17 @@ function mousePressed() {
     }
 }
 
+function resign() {
+    const end = {
+        "game_id": game_id,
+        "uid": uid,
+        "move_type": "Player " + uid + " resigned",
+        "from_position": undefined,
+        "to_position": undefined
+    };
+    sendResult(end);
+}
+
 function setup() {
     createCanvas(boardwidth * sq_width, boardwidth * sq_width).parent('canvasHolder');
     board = new Board(
@@ -723,7 +734,6 @@ function setup() {
     board.fill_board();
     board.show();
 }
-
 
 function draw() {
     board.show();

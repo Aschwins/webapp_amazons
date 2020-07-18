@@ -217,7 +217,7 @@ def move(data):
             opponent_uid = player.user_id
             opponent_sid = User.query.get(opponent_uid).sid
 
-    logger.info(f"Sending move to opponent: {opponent_sid}")
+    logger.info(f"Sending game over state to opponent: {opponent_sid}")
     data["turn"] = opponent_uid
     emit('move', data, opponent_sid, namespace='/test')
 
@@ -228,6 +228,7 @@ def end(data):
     game_id = int(data["game_id"])
     uid = current_user.id
     player = Player.query.filter_by(user_id=uid, game_id=game_id).first()
+    sid = User.query.get(uid).sid
 
     # Now with the uid and game_id we can find his opponent, and his channel.
     players = Player.query.filter_by(game_id=int(game_id))
@@ -241,7 +242,8 @@ def end(data):
 
     logger.info(f"Sending move to opponent: {opponent_sid}")
     data["turn"] = opponent_uid
-    emit('end', data, current_user.sid, namespace='/test')
+    logger.info(f"Current user socket: {sid}")
+    emit('end', data, sid, namespace='/test')
     emit('end', data, opponent_sid, namespace='/test')
 
 @socketio.on("game_ready", namespace='/test')

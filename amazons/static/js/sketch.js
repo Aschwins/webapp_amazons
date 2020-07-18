@@ -716,6 +716,7 @@ function mousePressed() {
 }
 
 function resign() {
+    console.log(turn);
     const end = {
         "game_id": game_id,
         "uid": uid,

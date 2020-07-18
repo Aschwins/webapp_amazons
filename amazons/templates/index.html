@@ -23,23 +23,22 @@
     <div class="jumbotron">
         <h1>Welcome to Amazons</h1>
         <p>It is time to fire up some noobs.</a>.</p>
-        <p>
-            <a class="btn btn-lg btn-default" role="button" href="http://127.0.0.1:5000/game"> Play a game.</a>
-        </p>
+        <form id="join_waiting_room" method="POST" action='#'>
+            <input class="btn btn-lg btn-default" type="submit" value="Play a game.">
+        </form>
     </div>
 </div>
 <div class="container">
     <div>
-        <h1>Flask-SocketIO Test</h1>
-
-        <form id="join_waiting_room" method="POST" action='#'>
-            <input type="submit" value="Join Room">
-        </form>
-        <h2>Receive:</h2>
+        <h2>Players Online:</h2>
         <div id="log"></div>
 
         <h2>Players in waiting room:</h2>
-        <div id="waiting"></div>
+            <ul class="list-group" id="waiting">
+                {% for w in waiting %}
+                    <li class="list-group-item">{{ w[1] }}</li>
+                {% endfor %}
+            </ul>
     </div>
 </div>
 {%- endblock %}

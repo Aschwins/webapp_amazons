@@ -84,7 +84,8 @@ def background_thread():
 @app.route("/index", methods=["GET", "POST"])
 @login_required
 def index():
-    resp = make_response(render_template('index.html'))
+    logger.debug(f"Clients in waiting: {clients_in_waiting}")
+    resp = make_response(render_template('index.html', waiting=clients_in_waiting))
     return resp
 
 
@@ -178,11 +179,14 @@ def on_join(data):
 
 @socketio.on('join_waiting', namespace='/test')
 def join_waiting():
+    global clients_in_waiting
     current_user.sid = request.sid
-    db.session.commit()
+    if (current_user.id, current_user.username) not in clients_in_waiting:
+        clients_in_waiting.append((current_user.id, current_user.username))
+        emit('update_waiting_room', {'clients_in_waiting': clients_in_waiting}, broadcast=True)
+    else:
+        return
 
-    clients_in_waiting.append((current_user.id, current_user.username))
-    emit('update_waiting_room', {'clients_in_waiting': str(clients_in_waiting)}, broadcast=True)
 
 
 @socketio.on('move', namespace='/test')

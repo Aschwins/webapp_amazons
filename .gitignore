@@ -2,6 +2,7 @@
 .flaskenv
 migrations/
 amazons/app.db
+certs/
 
 **/data/
 # Byte-compiled / optimized / DLL files

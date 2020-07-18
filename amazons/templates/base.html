@@ -26,7 +26,6 @@
 
         socket.on("update_waiting_room", function(msg) {
             console.log("Updating waiting room: ", msg.clients_in_waiting);
-            console.log("JQUERY waiting:", $('#waiting'))
             $('#waiting').empty()
             for (i = 0; i < msg.clients_in_waiting.length; i++) {
                 $('#waiting').append('<li class="list-group-item">' + msg.clients_in_waiting[i][1].toString() + '</li>');

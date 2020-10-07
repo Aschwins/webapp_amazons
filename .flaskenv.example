@@ -1,5 +1,0 @@
-FLASK_APP=wsgi.py
-FLASK_ENV=production
-FLASK_RUN_PORT=8000
-SECRET_KEY=impute_secret_key_here
-DATABASE_URL=mysql+pymysql://amazons:<password>@localhost:3306/amazons

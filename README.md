@@ -11,29 +11,15 @@ Elwyn Berlekamp. [video](https://www.youtube.com/watch?v=kjSOSeRZVNg)
 
 The webapplication could be run locally to play games against someone else on the same screen, but we're planning to bring it live very soon.
 
-To start the Flask web application in development mode, run the following with pip and virtualenv installed.
+To start the Flask web application in development mode, run the following with docker installed.
 
 ```sh
 git clone https://github.com/Aschwins/webapp_amazons/master
 
-# Create a virtual environment
-virtualenv -p python3 venv
-source venv/bin/activate
-
-# Install the dependencies
-pip install -r requirements.txt
-python3 setup.py develop
-
-# Copy flask env and rename to env
-cp .flaskenv.example .flaskenv
+cp .env.example .env
 
 # Create database
-flask db init
-flask db migrate -m 'init'
-flask db upgrade
-
-# Run the application
-flask run
+docker-compose -f docker-compose.dev.yml up -d --build
 ```
 
 Happy hunting!
@@ -44,12 +30,16 @@ https://game-of-amazons.org
 
 For the production version of the web application we use a linux server in Amazon Lightsail.
 
+```sh
+git clone https://github.com/Aschwins/webapp_amazons/master
 
-### Supervisor
-We're using the [supervisor](http://supervisord.org/) to run gunicorn in the background. The config file for the 
-supervisor can be found in `/etc/supervisor/conf.d`. Use 
-```sudo supervisorctl reload```
-to start the server.
+cp .env.example .env
+
+# Create database
+docker-compose up -d --build
+
+source install.sh
+```
 
 ### Nginx
 We use nginx as a reverse proxy. The config can be found at `/etc/nginx/sites-enabled/amazons`. All requests to http 

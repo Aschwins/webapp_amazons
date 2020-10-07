@@ -9,8 +9,8 @@ deploy_packages = [
 setup(
     name='package-name',
     version="1.0.0",
-    packages=find_packages(where='src'),
-    package_dir={"": "amazons"},
+    packages=find_packages(where='app'),
+    package_dir={"": "app"},
     install_requires=deploy_packages,
     description='Amazons Flask App',
     entry_points={"console_scripts": ["amazons = amazons.cli:main"]},

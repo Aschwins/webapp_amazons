@@ -1,0 +1,18 @@
+FROM python:3.7
+
+RUN adduser amazons
+WORKDIR /home/amazons/
+RUN chown -R amazons /home/amazons
+
+COPY requirements.txt .
+
+RUN pip install -r requirements.txt
+
+COPY . .
+RUN python setup.py develop
+
+ENV FLASK_APP run.py
+
+COPY script/entrypoint.dev.sh /entrypoint.dev.sh
+RUN chmod +x /entrypoint.dev.sh
+ENTRYPOINT ["/entrypoint.dev.sh"]

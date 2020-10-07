@@ -1,5 +1,5 @@
-from amazons import app, db
-from amazons.models import User, Game
+from app import app, db
+from app.models import User, Game
 
 
 @app.shell_context_processor

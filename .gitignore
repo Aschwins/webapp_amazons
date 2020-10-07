@@ -1,7 +1,7 @@
 # amazons
 .flaskenv
 migrations/
-amazons/app.db
+app.db
 certs/
 
 **/data/

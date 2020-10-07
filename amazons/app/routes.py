@@ -9,8 +9,8 @@ from flask_login import current_user, login_user, logout_user, login_required
 from util import configure_loggers
 from forms import LoginForm, RegistrationForm
 
-from amazons import app, db, socketio, migrate
-from amazons.models import User, Game, Player, Move
+from app import app, db, socketio, migrate
+from app.models import User, Game, Player, Move
 
 from werkzeug.urls import url_parse
 

@@ -18,4 +18,4 @@ socketio = SocketIO(app, async_mode='threading')
 login = LoginManager(app)
 login.login_view = 'login'
 
-from amazons import routes, models
+from app import routes, models

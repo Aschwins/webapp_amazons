@@ -8,9 +8,9 @@ sudo rm /etc/nginx/sites-enabled/amazons
 sudo mv /etc/nginx/sites-enabled/nginx_amazons.conf /etc/nginx/sites-enabled/amazons
 
 # Update Supervisor Config
-sudo rm /etc/supervisor/conf.d/amazons.conf
-sudo cp amazons.conf /etc/supervisor/conf.d/amazons.conf
+# sudo rm /etc/supervisor/conf.d/amazons.conf
+# sudo cp amazons.conf /etc/supervisor/conf.d/amazons.conf
 
 # Reload supervisor and nginx
-sudo supervisorctl reload
+# sudo supervisorctl reload
 sudo service nginx reload

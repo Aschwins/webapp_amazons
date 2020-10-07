@@ -1,8 +1,32 @@
 version: "3"
 
 services:
+
   amazons:
     container_name: amazons
-    build: .
+    restart: unless-stopped
+    build:
+      context: amazons/
+    env_file:
+      - .env
+    depends_on: 
+      - amazons_db
+    links:
+      - amazons_db
     ports:
-      - "0.0.0.0:8000:8000"
+      - "0.0.0.0:${HOST_MACHINE_AMAZONS_PORT}:5000"
+    
+  amazons_db:
+    container_name: amazons_db
+    restart: unless-stopped
+    env_file:
+      - .env
+    build:
+      context: postgresql/
+    # volumes:
+    #   - pg_data:/var/lib/postgresql/data
+    ports:
+      - "${HOST_MACHINE_AMAZONS_DB_PORT}:5432"
+
+# volumes:
+#   pg_data:

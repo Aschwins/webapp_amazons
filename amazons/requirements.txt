@@ -11,3 +11,4 @@ gunicorn
 eventlet
 pandas
 pymysql
+psycopg2

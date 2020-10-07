@@ -5,4 +5,4 @@ flask db init
 flask db migrate -m "init"
 flask db upgrade
 
-gunicorn -b 0.0.0.0:5000 -w 1 app:app
+gunicorn --worker-class eventlet -b localhost:5000 -w 1 amazons:app

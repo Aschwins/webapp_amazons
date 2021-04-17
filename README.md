@@ -40,6 +40,10 @@ Happy hunting!
 
 ## Production
 
+``` 
+virtualenv -p python3.7 venv
+```
+
 https://game-of-amazons.org
 
 For the production version of the web application we use a linux server in Amazon Lightsail.

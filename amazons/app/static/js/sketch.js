@@ -1,4 +1,4 @@
-const boardwidth = 5;
+const boardwidth = 6;
 const sq_width = 60;
 
 const game_id = localStorage.getItem("game_id")

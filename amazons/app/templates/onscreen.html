@@ -4,7 +4,7 @@
     {{ super() }}
     <script src="static/libraries/p5.js"></script>
     <script src="static/libraries/p5.dom.js"></script>
-    <script src="static/js/single.js"></script>
+    <script src="static/js/onscreen.js"></script>
 {% endblock %}
 
 {% block content %}
@@ -19,5 +19,6 @@
         <p id="p1">Player 1: </p>
         <p id="p2">Player 2: </p>
         <p id="game_id">Game: </p>
+        <button onclick="resign()">Resign</button> 
     </div>
 {% endblock %}

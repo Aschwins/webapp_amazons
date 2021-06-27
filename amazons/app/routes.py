@@ -267,9 +267,13 @@ def game_ready(data):
 def singleplayer():
     return render_template('singleplayer.html')
 
+@app.route("/onscreen")
+def onscreen():
+    return render_template('onscreen.html')
+
 @app.route("/api", methods=['POST'])
 def api():
-    api_url = 'http://localhost:5500'
+    api_url = 'https://t986vc8erf.execute-api.eu-west-1.amazonaws.com/dev'
     payload = request.json
     r = requests.post(api_url, json=payload)
     next_boardstate = r.json()['next_boardstate']

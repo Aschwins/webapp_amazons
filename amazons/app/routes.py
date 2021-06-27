@@ -1,6 +1,7 @@
 import time
+import requests
 
-from flask import request, make_response, flash
+from flask import request, make_response, flash, jsonify
 from flask import render_template, session, redirect, url_for
 from flask_socketio import SocketIO, emit, join_room, leave_room, \
     close_room, rooms, disconnect
@@ -266,7 +267,14 @@ def game_ready(data):
 def singleplayer():
     return render_template('singleplayer.html')
 
-
+@app.route("/api", methods=['POST'])
+def api():
+    api_url = 'http://localhost:5500'
+    payload = request.json
+    r = requests.post(api_url, json=payload)
+    next_boardstate = r.json()['next_boardstate']
+    response_payload = { 'next_boardstate' : next_boardstate }
+    return jsonify(response_payload)
 
 if __name__ == "__main__":
     db.create_all()

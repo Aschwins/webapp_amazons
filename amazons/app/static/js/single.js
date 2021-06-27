@@ -7,6 +7,22 @@ const states = [
     'white_selects', 'white_moves', 'white_shoots',
     'black_selects','black_moves', 'black_shoots'];
 
+const ApiUrl = 'api'
+
+const mapping = {
+    '0': 0,
+    'White Amazon': 1,
+    'Black Amazon': 2,
+    'F': 3
+}
+
+const reverse_mapping = {
+    0: '0',
+    1: 'White Amazon',
+    2: 'Black Amazon',
+    3: 'F'
+}
+
 function create2darray(m, n, fill_value = undefined) {
 	// Function that creates an m x n array.
 	// m rows, n cols, fill with fill_value
@@ -246,6 +262,14 @@ class Board {
         }
         console.log("Board Filled with:")
         console.log(this.matrix)
+    }
+
+    apply_state(next_boardstate) {
+        for (let i = 0; i < boardwidth; i++) {
+            for (let j = 0; j < boardwidth; j++) {
+                board.matrix[i][j].state = reverse_mapping[next_boardstate[i][j]]
+            }
+        }
     }
 
     reset(state) {
@@ -558,18 +582,23 @@ function mousePressed() {
 
                 // check if black or white has no moves left
                 if (board.gameEnded()) {
-                    const end = {
-                        "game_id": game_id,
-                        "uid": uid,
-                        "move_type": board.state,
-                        "from_position": undefined,
-                        "to_position": undefined
-                    };
-                    sendResult(end);
+                    on_game_ended(board.state)
+                    return;
                 }
             } else {
                 return;
             }
+
+            // Now computer moves automatically
+            do_computer_move(board.matrix)
+            .then(out =>
+                {
+                    board.apply_state(out['next_boardstate'])
+                    board.reset("white_selects")
+                    if (board.gameEnded()) {
+                        on_game_ended(board.state)
+                    }
+                })
         }
 
         // Black Selects
@@ -613,15 +642,20 @@ function mousePressed() {
 
                 // check if black or white has no moves left
                 if (board.gameEnded()) {
-                    const end = {
-                        "game_id": game_id,
-                        "uid": uid,
-                        "move_type": board.state,
-                        "from_position": undefined,
-                        "to_position": undefined
-                    };
-                    sendResult(end);
+                    on_game_ended(board.state)
+                    return;
                 }
+
+                // Now computer moves automatically
+                do_computer_move(board.matrix)
+                    .then(out =>
+                        {
+                            board.apply_state(out['next_boardstate'])
+                            board.reset("black_selects")
+                            if (board.gameEnded()) {
+                                on_game_ended(board.state)
+                            }
+                        })
             } else {
                 return;
             }
@@ -638,14 +672,42 @@ function mousePressed() {
     }
 }
 
+function get_basic_board(matrix) {
+    mat = [];
+	for (i=0; i < boardwidth; i++) {
+		rows = [];
+		for (j=0; j < boardwidth; j++) {
+			rows.push(mapping[matrix[i][j].state]);
+		}
+		mat.push(rows);
+	}
+	return mat;
+}
+
+async function do_computer_move(matrix) {
+    let payload = {
+        'boardstate': get_basic_board(matrix)
+    }
+
+    console.log(JSON.stringify(payload))
+
+    return fetch(ApiUrl, {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(payload)
+    })
+    .then(res => res.json())
+}
+
+function on_game_ended(state) {
+    alert(state)
+    setup()
+}
+
 function resign() {
-    const end = {
-        "game_id": game_id,
-        "uid": uid,
-        "move_type": "Player " + uid + " resigned",
-        "from_position": undefined,
-        "to_position": undefined
-    };
+    on_game_ended("White resigns")
 }
 
 function setup() {

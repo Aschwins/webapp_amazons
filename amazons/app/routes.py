@@ -262,6 +262,12 @@ def game_ready(data):
     logger.info(current_user.sid)
 
 
+@app.route("/singleplayer")
+def singleplayer():
+    return render_template('singleplayer.html')
+
+
+
 if __name__ == "__main__":
     db.create_all()
     socketio.run(app, host='0.0.0.0', debug=True)

@@ -273,7 +273,7 @@ def onscreen():
 
 @app.route("/api", methods=['POST'])
 def api():
-    api_url = 'https://t986vc8erf.execute-api.eu-west-1.amazonaws.com/dev'
+    api_url = 'http://127.0.0.1:5000/'
     payload = request.json
     r = requests.post(api_url, json=payload)
     next_boardstate = r.json()['next_boardstate']

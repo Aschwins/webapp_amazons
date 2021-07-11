@@ -686,7 +686,8 @@ function get_basic_board(matrix) {
 
 async function do_computer_move(matrix) {
     let payload = {
-        'boardstate': get_basic_board(matrix)
+        'boardstate': get_basic_board(matrix),
+        'mode': $('input[name=mode]:checked', '#modeForm').val()
     }
 
     console.log(JSON.stringify(payload))

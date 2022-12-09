@@ -1,6 +1,6 @@
 alembic==1.5.8
 bidict==0.21.2
-certifi==2021.5.30
+certifi==2022.12.7
 chardet==4.0.0
 click==7.1.2
 dnspython==1.16.0

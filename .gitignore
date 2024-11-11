@@ -1,4 +1,5 @@
 # amazons
+uv.lock
 .flaskenv
 migrations/
 app.db

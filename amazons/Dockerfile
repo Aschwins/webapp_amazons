@@ -1,4 +1,4 @@
-FROM python:3.7
+FROM python:3.12
 
 RUN adduser amazons
 WORKDIR /home/amazons/

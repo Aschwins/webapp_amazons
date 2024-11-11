@@ -15,18 +15,3 @@ services:
       - amazons_db
     ports:
       - "0.0.0.0:${HOST_MACHINE_AMAZONS_PORT}:5000"
-    
-  amazons_db:
-    container_name: amazons_db
-    restart: unless-stopped
-    env_file:
-      - .env
-    build:
-      context: postgresql/
-    # volumes:
-    #   - pg_data:/var/lib/postgresql/data
-    ports:
-      - "${HOST_MACHINE_AMAZONS_DB_PORT}:5432"
-
-# volumes:
-#   pg_data:

@@ -1,0 +1,6 @@
+.venv
+.vscode
+certs
+nginx_amazons.conf
+README.md
+.env.example

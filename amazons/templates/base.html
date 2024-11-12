@@ -1,0 +1,43 @@
+{% extends "bootstrap/base.html" %}
+
+{% block head %}
+{{super()}}
+<link rel="shortcut icon" href="{{ url_for('static', filename='img/favicon.ico') }}">
+<script src="//code.jquery.com/jquery-1.12.4.min.js" integrity="sha256-ZosEbRLbNQzLpnKIkEdrPv7lOy9C27hHQ+Xp8a4MxAQ=" crossorigin="anonymous"></script>
+{% endblock %}
+
+{% block content %}
+    {{ super() }}
+    <div class="container">
+    {% with messages = get_flashed_messages() %}
+        {% if messages %}
+            <ul>
+                {% for message in messages %}
+                    <li>{{ message }}</li>
+                {% endfor %}
+            </ul>
+        {% endif %}
+    {% endwith %}
+    </div>
+{% endblock %}
+
+{% block navbar %}
+ <nav class="navbar navbar-inverse">
+  <div class="container-fluid">
+    <div class="navbar-header">
+      <a class="navbar-brand" href="#">Game Of Amazons</a>
+    </div>
+  </div>
+</nav>
+{% endblock %}
+
+{% block title %}Game Of Amazons{% endblock %}
+
+{% import "bootstrap/fixes.html" as fixes %}
+
+{% block styles -%}
+    {{super()}}  {# do not forget to call super or Bootstrap's own stylesheets
+                    will disappear! #}
+    <link rel="stylesheet" type="text/css"
+          href="{{url_for('static', filename='goa.css')}}">
+{% endblock %}

@@ -1,7 +1,18 @@
-from app import app, db
-from app.models import User, Game
+from flask_bootstrap import Bootstrap
+from flask import render_template, Flask
 
 
-@app.shell_context_processor
-def make_shell_context():
-    return {'db': db, 'User': User, 'Game': Game}
+app = Flask(__name__)
+Bootstrap(app)
+
+@app.route("/")
+def hello_world():
+    return render_template('index.html')
+
+@app.route("/index")
+def index():
+    return render_template('index.html')
+
+@app.route("/onscreen")
+def onscreen():
+    return render_template('onscreen.html')

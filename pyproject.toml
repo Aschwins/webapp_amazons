@@ -1,0 +1,23 @@
+[project]
+name = "webapp-amazons"
+version = "0.1.0"
+description = "Add your description here"
+readme = "README.md"
+requires-python = ">=3.12"
+dependencies = [
+    "flask>=3.0.3",
+    "flask-bootstrap>=3.3.7.1",
+    "gunicorn>=23.0.0",
+    "python-dotenv>=1.0.1",
+]
+
+[tool.setuptools.packages.find]
+include = ["amazons*"]
+exclude = [
+    "docs",
+    "images",
+    "notebooks",
+    "tests",
+    "migrations",
+    "Dockerfile*"
+]

@@ -15,34 +15,31 @@ To start the Flask web application in development mode, run the following with p
 
 ```sh
 git clone https://github.com/Aschwins/webapp_amazons/master
+cd webapp_amazons
 
-# Create a virtual environment
-virtualenv -p python3 venv
-source venv/bin/activate
+# Install uv by astrall
+curl -LsSf https://astral.sh/uv/install.sh | sh
 
-# Install the dependencies
-pip install -r requirements.txt
-python3 setup.py develop
+# Create virtual environment
+uv sync
+source .venv/bin/activate
 
-# Copy flask env and rename to env
-cp .flaskenv.example .flaskenv
-
-# Create database
-flask db init
-flask db migrate -m 'init'
-flask db upgrade
+# Copy env.example and rename to env and fill in the variables.
+cp .env.example .env
 
 # Run the application
-flask run
+flask --app amazons/run run
+```
+
+or with docker
+
+```sh
+docker compose -f docker-compose.dev.yml up -d --build
 ```
 
 Happy hunting!
 
 ## Production
-
-``` 
-virtualenv -p python3.7 venv
-```
 
 https://game-of-amazons.org
 
@@ -59,26 +56,3 @@ to start the server.
 We use nginx as a reverse proxy. The config can be found at `/etc/nginx/sites-enabled/amazons`. All requests to http 
 (port 80) get rerouted to https (443), which get rerouted to the webapp server on port 8000.
 ```sudo service nginx reload```
-
-
-## With Docker
-
-```sh
-git clone https://github.com/Aschwins/webapp_amazons/master
-
-cp .env.example .env
-
-# Create database
-docker-compose -f docker-compose.dev.yml up -d --build
-```
-
-```
-git clone https://github.com/Aschwins/webapp_amazons/master
-
-cp .env.example .env
-
-# Create database
-docker-compose up -d --build
-
-source install.sh
-```

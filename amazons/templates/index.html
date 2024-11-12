@@ -1,13 +1,23 @@
-{% extends "base.html" %}
+{% extends 'base.html' %}
 
-{# Loads some of the macros included with Flask-Bootstrap. We are using the
-   utils module here to automatically render Flask's flashed messages in a
-   bootstrap friendly manner #}
-{% import "bootstrap/utils.html" as utils %}
+{% block head %}
+    {{ super() }}
+    <script src="static/libraries/p5.js"></script>
+    <script src="static/libraries/p5.dom.js"></script>
+    <script src="static/js/onscreen.js"></script>
+{% endblock %}
 
-
-{# Inside the ``content`` is where you should place most of your own stuff.
-   This will keep scripts at the page end and a navbar you add on later
-   intact. #}
 {% block content %}
-{%- endblock %}
+{{ super() }}
+    <div class="container">
+    <h1>Let's play a game!</h1>
+    </div>
+
+    <div id="canvasHolder" align="center"></div>
+
+    <div class="container">
+        <p id="p1">Player 1: </p>
+        <p id="p2">Player 2: </p>
+        <p id="game_id">Game: </p>
+    </div>
+{% endblock %}

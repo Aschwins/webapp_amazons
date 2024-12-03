@@ -25,4 +25,4 @@ ENV PATH="/app/.venv/bin:$PATH"
 ENTRYPOINT []
 
 # use gunicorn to run a flask app
-CMD ["gunicorn", "--bind", "0.0.0.0:8000", "amazons.run:app"]
+CMD ["gunicorn", "--bind", "0.0.0.0:5000", "amazons.run:app"]

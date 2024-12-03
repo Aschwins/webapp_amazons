@@ -34,7 +34,7 @@ flask --app amazons/run run
 or with docker
 
 ```sh
-docker compose -f docker-compose.dev.yml up -d --build
+docker compose  up -d --build
 ```
 
 Happy hunting!
